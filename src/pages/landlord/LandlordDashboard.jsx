@@ -5,20 +5,35 @@ import RoomsPage from './RoomsPage';
 import TenantsPage from './TenantsPage';
 import PaymentsPage from './PaymentsPage';
 import MaintenanceRequestsPage from './MaintenanceRequestsPage';
+import NoticesPage from './NoticesPage';
+import RulesPage from './RulesPage';
+import RentalRequestsPage from './RentalRequestsPage';
 
-// Phase 1 wires up Properties, Rooms, Tenants, Payments, and Maintenance.
-// Add more entries here as you build Utilities, Notices, Rules, etc.
-// (each with its own page component, same pattern as PropertiesPage).
+// Phase 1 wires up Properties, Rooms, Tenants, Payments, Maintenance,
+// Notices, Rules, and Rental Requests. Add more entries here as you
+// build Utilities, Chat, etc. (each with its own page component, same
+// pattern as PropertiesPage).
 const NAV_ITEMS = [
   { key: 'properties', label: 'Properties' },
   { key: 'rooms', label: 'Rooms' },
   { key: 'tenants', label: 'Tenants' },
+  { key: 'rental-requests', label: 'Rental Requests' },
   { key: 'payments', label: 'Payments' },
   { key: 'maintenance', label: 'Maintenance' },
   { key: 'notices', label: 'Notices' },
+  { key: 'rules', label: 'Rules' },
 ];
 
-const BUILT_KEYS = ['properties', 'rooms', 'tenants', 'payments', 'maintenance'];
+const BUILT_KEYS = [
+  'properties',
+  'rooms',
+  'tenants',
+  'rental-requests',
+  'payments',
+  'maintenance',
+  'notices',
+  'rules',
+];
 
 export default function LandlordDashboard() {
   const [active, setActive] = useState('properties');
@@ -28,8 +43,11 @@ export default function LandlordDashboard() {
       {active === 'properties' && <PropertiesPage />}
       {active === 'rooms' && <RoomsPage />}
       {active === 'tenants' && <TenantsPage />}
+      {active === 'rental-requests' && <RentalRequestsPage />}
       {active === 'payments' && <PaymentsPage />}
       {active === 'maintenance' && <MaintenanceRequestsPage />}
+      {active === 'notices' && <NoticesPage />}
+      {active === 'rules' && <RulesPage />}
       {!BUILT_KEYS.includes(active) && (
         <div className="rounded-xl border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500">
           {NAV_ITEMS.find((n) => n.key === active)?.label} — build this page next,

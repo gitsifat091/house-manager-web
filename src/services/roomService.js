@@ -4,6 +4,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  getDoc,
   getDocs,
   query,
   where,
@@ -34,6 +35,14 @@ export async function getRoomsByProperty(propertyId) {
   const q = query(roomsRef, where('propertyId', '==', propertyId));
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+// Used to re-verify a room is still vacant right before accepting a
+// rental request, as a last-line guard against a race between two
+// near-simultaneous requests/accepts.
+export async function getRoomById(roomId) {
+  const snap = await getDoc(doc(db, 'rooms', roomId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
 // Called when a tenant is assigned to a room (marks it occupied and
