@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Users can read/write their own profile only.
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(uid);
+    }
+
+    // Properties: any signed-in landlord can create; only the owning
+    // landlord can update/delete; anyone signed in can read (tenants
+    // need to browse listings).
+    match /properties/{propertyId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.landlordId == request.auth.uid;
+    }
+
+    match /rooms/{roomId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    match /tenants/{tenantId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && resource.data.landlordId == request.auth.uid;
+    }
+
+    // Tighten these further as you build out each feature —
+    // this is a starting point, not a final security model.
+  }
+}
