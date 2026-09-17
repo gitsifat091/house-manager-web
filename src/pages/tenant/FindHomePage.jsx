@@ -1,16 +1,26 @@
 import { useEffect, useState } from 'react';
 import { getListedProperties } from '../../services/propertyService';
+import { getActiveTenantByEmail } from '../../services/tenantService';
+import { useAuth } from '../../context/AuthContext';
 
 export default function FindHomePage() {
+  const { user } = useAuth();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getListedProperties().then((data) => {
-      setProperties(data);
+    Promise.all([
+      getListedProperties(),
+      getActiveTenantByEmail(user.email),
+    ]).then(([listed, currentTenancy]) => {
+      // Don't show a property the tenant already has an active tenancy in.
+      const filtered = currentTenancy
+        ? listed.filter((p) => p.id !== currentTenancy.propertyId)
+        : listed;
+      setProperties(filtered);
       setLoading(false);
     });
-  }, []);
+  }, [user.email]);
 
   if (loading) return <p className="text-sm text-gray-500">Loading...</p>;
 

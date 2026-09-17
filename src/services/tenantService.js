@@ -35,3 +35,14 @@ export async function getTenantsByLandlord(landlordId) {
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
+
+// Links a logged-in tenant (Firebase Auth user) to the tenant record their
+// landlord created for them, by matching email. Used so a tenant can see
+// their own rent/payments without a separate account-linking flow.
+export async function getActiveTenantByEmail(email) {
+  const q = query(tenantsRef, where('email', '==', email), where('isActive', '==', true));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, ...d.data() };
+}
